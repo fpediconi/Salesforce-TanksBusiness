@@ -1,0 +1,8 @@
+/* CsvTankUploader.css */
+.slds-p-around_medium {
+    min-height: 200px; /* Para que el card no “salte” cuando aparece/desaparece el spinner */
+}
+
+.slds-text-align_center {
+    text-align: center;
+}
