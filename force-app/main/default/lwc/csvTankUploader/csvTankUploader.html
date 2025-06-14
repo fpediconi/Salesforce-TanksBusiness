@@ -1,0 +1,104 @@
+<template>
+    <lightning-card title="Bulk Tank Uploader">
+        <div class="slds-p-around_medium">
+            <!-- 1) Combobox para elegir Tank Type -->
+            <lightning-combobox
+                name="tankType"
+                label="Seleccione Tipo de Tanque"
+                placeholder="-- elegir un tipo --"
+                options={tankTypeOptions}
+                value={selectedTankTypeId}
+                onchange={handleTankTypeChange}>
+            </lightning-combobox>
+
+            <!-- 1.1) O creamos uno :) -->
+             <lightning-button
+                label="Crear nuevo tipo de tanque"
+                variant="neutral"
+                class="slds-m-top_small"
+                onclick={handleCreateNewTankType}>
+            </lightning-button>
+            <template if:true={showModal}>
+                <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container">
+                        <header class="slds-modal__header">
+                            <h2 class="slds-modal__title">Crear nuevo Tipo de Tanque</h2>
+                        </header>
+                        <div class="slds-modal__content slds-p-around_medium">
+                            <lightning-record-edit-form
+                                object-api-name="Tank_Type__c"
+                                onsuccess={handleNewTankTypeCreated}>
+                                
+                                <lightning-messages></lightning-messages>
+
+                                <lightning-input-field field-name="Name" data-id="nombre"></lightning-input-field>
+                                <lightning-input-field field-name="Capacity__c" data-id="capacidad"></lightning-input-field>
+                                <lightning-input-field field-name="List_Price__c" data-id="precio"></lightning-input-field>
+                                <lightning-input-field field-name="Brand__c" data-id="marca"></lightning-input-field>
+
+                                <div class="slds-m-top_medium">
+                                    <lightning-button
+                                        type="submit"
+                                        label="Crear"
+                                        variant="brand">
+                                    </lightning-button>
+
+                                    <lightning-button
+                                        label="Cancelar"
+                                        variant="neutral"
+                                        class="slds-m-left_small"
+                                        onclick={closeModal}>
+                                    </lightning-button>
+                                </div>
+                            </lightning-record-edit-form>
+                        </div>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </template>
+
+
+
+            <!-- 2) Input de archivo CSV -->
+            <lightning-input 
+                type="file" 
+                label="Seleccione un CSV"
+                accept=".csv"
+                onchange={handleFileChange}
+                disabled={isFileInputDisabled}>
+            </lightning-input>
+
+            <template if:true={fileName}>
+                <p class="slds-m-top_x-small">Archivo: <strong>{fileName}</strong></p>
+            </template>
+
+            <!-- 3) Botón para procesar el CSV e invocar Apex -->
+            <lightning-button 
+                class="slds-m-top_small"
+                label="Procesar CSV e importar"
+                variant="brand"
+                onclick={handleUpload}
+                disabled={isUploadDisabled}>
+            </lightning-button>
+
+            <template if:true={isLoading}>
+                <div class="slds-m-top_medium slds-text-align_center">
+                    <lightning-spinner alternative-text="Procesando registros" size="large"></lightning-spinner>
+                    <p>Procesando registros…</p>
+                </div>
+            </template>
+
+            <!-- 4) Data table con resultados detallados!!! -->
+            <template if:true={uploadResults.length}>
+                <div class="slds-m-top_medium">
+                    <lightning-datatable
+                        key-field="index"
+                        data={uploadResults}
+                        columns={columns}
+                        hide-checkbox-column>
+                    </lightning-datatable>
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>
